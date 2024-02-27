@@ -30,9 +30,9 @@ const createUser = catchAsyncError(async (req, res, next) => {
     public_id: result.public_id,
     url: result.secure_url,
   }
-  await unlinkAsync(file).then(()=>{
-        console.log('file deleted succesfully');
-  }).catch((err)=>console.log('error while deleting image',err));
+  // await unlinkAsync(file).then(()=>{
+  //       console.log('file deleted succesfully');
+  // }).catch((err)=>console.log('error while deleting image',err));
   
 
   //create encrypt password............
