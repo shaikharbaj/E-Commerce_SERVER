@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
   res.send("server is running");
 });
 
-app.use("/api/v2",router);
+// app.use("/api/v2",router);
 
 app.use(ErrorHandler);
 
