@@ -5,29 +5,35 @@ const User = require("../Model/UserModel.js");
 const ErrorHandler = require("../utils/ErrorHandler");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
+const util = require('util')
 const bcrypt = require("bcryptjs");
-const sendMail = require("../utils/sendMail.js");
+const cloudinary = require('../utils/cloudinary.js')
+// const sendMail = require("../utils/sendMail.js");
 const catchAsyncError = require("../Middleware/catchAsyncError.js");
+const unlinkAsync = util.promisify(fs.unlink);
 
 const createUser = catchAsyncError(async (req, res, next) => {
   const { email, name, password } = req.body;
   //check user already exist....
   const checkuser = await User.findOne({ email });
-  if (checkuser) {
-    const filename = req.file.filename;
 
-    const filepath = `uploads/${filename}`;
-    await fs.unlink(filepath, (err) => {
-      if (err) {
-        console.log("Error While Deleting file");
-      } else {
-        console.log("file deleted successfully");
-      }
-    });
+  if (checkuser) {
     return next(new ErrorHandler("user already exist", 400));
   }
-  const filename = req.file.filename;
-  const fileUrl = path.join(filename);
+
+  const file = req.file.path;
+  console.log(req.file);
+  const result = await cloudinary.uploader.upload(file, {
+    folder: "avatar",
+  });
+  const imgUrl ={
+    public_id: result.public_id,
+    url: result.secure_url,
+  }
+  await unlinkAsync(file).then(()=>{
+        console.log('file deleted succesfully');
+  }).catch((err)=>console.log('error while deleting image',err));
+  
 
   //create encrypt password............
   const hashpassword = await bcrypt.hash(password, 10);
@@ -36,16 +42,11 @@ const createUser = catchAsyncError(async (req, res, next) => {
     name: name,
     email: email,
     password: hashpassword,
-    avatar: fileUrl,
+    avatar: imgUrl,
   };
-
+  console.log(user);
   //save to database......
   const newUser = await User.create(user);
-
-  //create jwt token.................
-  // const token = await jwt.sign(user, process.env.JWT_SECRET, {
-  //   expiresIn: "5m",
-  // });
 
   return res.status(201).json({
     success: true,
