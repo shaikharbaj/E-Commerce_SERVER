@@ -5,6 +5,6 @@ const productRoutes = require('./productRoutes/productRoutes.js')
 const shopRoutes = require('./shopRoute/shopRoute.js')
 router.use("/user",userRoutes);
 router.use("/shop",shopRoutes);
-// router.use("/product",productRoutes);
+router.use("/product",productRoutes);
 
 module.exports=router;
