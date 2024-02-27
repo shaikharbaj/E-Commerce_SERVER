@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
   res.send("server is running");
 });
-app.get('/hello',async(req,res)=>{
+app.get('/hello/:id',async(req,res)=>{
      res.send('its working')
 })
 
